@@ -8,9 +8,9 @@ public class AccountService {
 		ma.setAmount(myAccount.getAmount() + 200);
 		ma.setName(myAccount.getName());
 		ma.setNumber(myAccount.getNumber());
-		return ma;
-		//myAccount.setAmount(myAccount.getAmount() + 200);
-		//return myAccount;
+		//return ma;
+		myAccount.setAmount(myAccount.getAmount() + 200);
+		return myAccount;
 	}
 
 }

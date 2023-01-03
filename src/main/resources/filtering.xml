@@ -29,6 +29,6 @@
 
 
     <int:header-filter input-channel="inputChannel"
-                       output-channel="outputChannel" header-names="lastName, state"/>
+                       output-channel="responseChannel" header-names="lastName, state"/>
 
 </beans>
