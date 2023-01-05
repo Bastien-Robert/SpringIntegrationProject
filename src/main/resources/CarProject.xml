@@ -3,7 +3,6 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:int="http://www.springframework.org/schema/integration"
        xmlns:int-file="http://www.springframework.org/schema/integration/file"
-       xmlns:beans="http://www.springframework.org/schema/c"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
            http://www.springframework.org/schema/beans/spring-beans.xsd
            http://www.springframework.org/schema/integration
@@ -18,18 +17,39 @@
     		<int:poller id="poller" fixed-delay="1000" />
     </int-file:inbound-channel-adapter>
 
-    <int:channel id="outputChannel"></int:channel>
-
     <int:channel id="mainChannel"></int:channel>
 
     <int:json-to-object-transformer input-channel="inputChannel" output-channel="mainChannel" type="test.CarList"></int:json-to-object-transformer>
 
-    <int:splitter id="splitter"
+    <int:channel id="splitterChannel"></int:channel>
+
+    <int:channel id="outputChannel"></int:channel>
+
+    <!--<int:splitter id="splitter"
                   input-channel="mainChannel"
-                  output-channel="outputChannel"/>
+                  output-channel="splitterChannel"/>-->
 
-    <int:logging-channel-adapter channel="outputChannel" level="INFO"/>
+    <int:channel id="routerChannel1"></int:channel>
+    <int:channel id="routerChannel2"></int:channel>
 
-    
+    <int:recipient-list-router id="customRouter" input-channel="mainChannel">
+        <int:recipient channel="routerChannel1"/>
+        <int:recipient channel="routerChannel2"/>
+    </int:recipient-list-router>
+
+    <int:channel id="colorChangeChannel"></int:channel>
+
+    <int:service-activator input-channel="routerChannel1" output-channel="colorChangeChannel" ref="serviceID" method="ChangingColor"/>
+    <bean id="serviceID" class="test.CarColor"/>
+
+    <int:filter input-channel="routerChannel2" expression="payload.equals('grey')"/>
+
+    <int:channel id="filesOut1"></int:channel>
+
+    <int:object-to-json-transformer id="t1" input-channel="mainChannel" output-channel="filesOut1"></int:object-to-json-transformer>
+
+    <int-file:outbound-channel-adapter id="f1" channel="filesOut1" directory="dataOut/greyCars"/>
+
+    <int:logging-channel-adapter channel="mainChannel" level="INFO"/>
+
 </beans>
-    
