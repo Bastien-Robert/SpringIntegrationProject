@@ -2,8 +2,9 @@ package test;
 
 public class CarColor {
     public MyCar ChangingColor(MyCar myCar){
-        System.out.println(myCar);
-        myCar.setColor("OUI");
+        if (myCar.getName().equals("Tesla model X Plaid")) {
+            myCar.setColor("black");
+        }
         return myCar;
     }
 }

@@ -15,9 +15,9 @@ public class Main {
 
 		//ApplicationContext ctx = new ClassPathXmlApplicationContext("routing.xml");
 
-		//ApplicationContext ctx = new ClassPathXmlApplicationContext("CarProject.xml");
+		ApplicationContext ctx = new ClassPathXmlApplicationContext("CarProject.xml");
 
-		ApplicationContext ctx = new ClassPathXmlApplicationContext("filtering.xml");
+		//ApplicationContext ctx = new ClassPathXmlApplicationContext("filtering.xml");
 
 		/*ApplicationContext ctx = new ClassPathXmlApplicationContext("javaScriptService.xml");
 

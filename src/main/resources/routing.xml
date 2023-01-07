@@ -18,8 +18,7 @@
     </int-file:inbound-channel-adapter>
     
     <int:json-to-object-transformer input-channel="channelEntree" output-channel="mainChannel" type="test.MyAccount"></int:json-to-object-transformer>
-    
-    
+
     <int:channel id="mainChannel"></int:channel>
     
     <int:recipient-list-router id="customRouter" input-channel="mainChannel">
