@@ -10,20 +10,18 @@
            http://www.springframework.org/schema/integration/file
            http://www.springframework.org/schema/integration/file/spring-integration-file-5.1.xsd">
 
-    <int:channel id="mainChannel"/>
-    <int:channel id="splitterChannel"/>
-    <int:channel id="outputChannel"/>
-    <int:channel id="colorChangeChannel"/>
-    <int:channel id="routerChannel1"/>
-    <int:channel id="routerChannel2"/>
-    <int:channel id="loggingChannel"/>
-    <int:channel id="resequencerChannel"/>
-    <int:channel id="filesOut1"/>
-    <int:channel id="filterColorChannel"/>
-    <int:channel id="filterMotorChannel"/>
-    <int:channel id="aggregatorChannel1"/>
-    <int:channel id="aggregatorChannel2"/>
-    <int:channel id="filesOut2"/>
+    <int:channel id="mainChannel"></int:channel>
+    <int:channel id="splitterChannel"></int:channel>
+    <int:channel id="outputChannel"></int:channel>
+    <int:channel id="colorChangeChannel"></int:channel>
+    <int:channel id="routerChannel1"></int:channel>
+    <int:channel id="routerChannel2"></int:channel>
+    <int:channel id="loggingChannel"></int:channel>
+    <int:channel id="aggregatorChannel1"></int:channel>
+    <int:channel id="filesOut1"></int:channel>
+    <int:channel id="filterChannel"></int:channel>
+    <int:channel id="aggregatorChannel2"></int:channel>
+    <int:channel id="filesOut2"></int:channel>
 
     <int-file:inbound-channel-adapter 
 		channel="inputChannel"
@@ -46,40 +44,33 @@
     <int:service-activator input-channel="routerChannel1" output-channel="colorChangeChannel" ref="serviceID" method="ChangingColor"/>
     <bean id="serviceID" class="test.CarColor"/>
 
-    <int:resequencer input-channel="colorChangeChannel"
-                     output-channel="resequencerChannel"
-                     release-strategy-expression="size()==4">
-    </int:resequencer>
+    <int:recipient-list-router id="myRouter2" input-channel="colorChangeChannel">
+        <int:recipient channel="outputChannel"/>
+        <int:recipient channel="loggingChannel"/>
+    </int:recipient-list-router>
 
-    <int:aggregator id="myAggregator1"
-                    input-channel="resequencerChannel"
+    <int:logging-channel-adapter id="loggingChannel" level="INFO"/>
+
+    <int:aggregator id="myAggregator"
+                    input-channel="outputChannel"
                     output-channel="aggregatorChannel1"
                     release-strategy-expression="size()==4">
     </int:aggregator>
 
     <int:object-to-json-transformer id="t1" input-channel="aggregatorChannel1" output-channel="filesOut1"></int:object-to-json-transformer>
 
-    <int-file:outbound-channel-adapter id="f1" channel="filesOut1" directory="dataOut/NewCarColor"/>
+    <int-file:outbound-channel-adapter id="f1" channel="filesOut1" directory="dataOut/newCarColor"/>
 
-    <int:filter input-channel="routerChannel2" output-channel="filterColorChannel" expression="payload.color.equals('grey')"/>
-
-    <int:filter input-channel="filterColorChannel" output-channel="filterMotorChannel" expression="payload.motorType.equals('thermal')"/>
+    <int:filter input-channel="routerChannel2" output-channel="filterChannel" expression="payload.color.equals('grey')"/>
 
     <int:aggregator id="myAggregator2"
-                    input-channel="filterMotorChannel"
+                    input-channel="filterChannel"
                     output-channel="aggregatorChannel2"
-                    release-strategy-expression="size()==1">
+                    release-strategy-expression="size()==2">
     </int:aggregator>
 
-    <int:recipient-list-router id="myRouter2" input-channel="aggregatorChannel2">
-        <int:recipient channel="loggingChannel"/>
-        <int:recipient channel="outputChannel"/>
-    </int:recipient-list-router>
+    <int:object-to-json-transformer id="t2" input-channel="aggregatorChannel2" output-channel="filesOut2"></int:object-to-json-transformer>
 
-    <int:logging-channel-adapter channel="loggingChannel" level="INFO"/>
-
-    <int:object-to-json-transformer id="t2" input-channel="outputChannel" output-channel="filesOut2"></int:object-to-json-transformer>
-
-    <int-file:outbound-channel-adapter id="f2" channel="filesOut2" directory="dataOut/CustomerCar"/>
+    <int-file:outbound-channel-adapter id="f2" channel="filesOut2" directory="dataOut/greyCars"/>
 
 </beans>
